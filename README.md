@@ -17,6 +17,6 @@ a chat room and view all their accepted study sessions.
 This website was completed by a 5 person group for a CS3240 - Advanced Software Development and 
 Techniques project. Completed in my fall semester of third year (2022). 
 
-##Testing
-Unit Testing: Test Coverage on the files reached 70%
-System/Beta Testing: These scripts can be found at studybuddy -> test -> System Test Script 1, 2, 3
+## Testing
+**Unit Testing**: Test Coverage on the files reached 70%
+**System/Beta Testing**: These scripts can be found at studybuddy -> test -> System Test Script 1, 2, 3
