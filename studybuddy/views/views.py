@@ -106,17 +106,31 @@ class alldepartments(generic.ListView):
     # template_name = get_template_name()
 
     # Get the json for all the departments
-    deptList = requests.get('http://luthers-list.herokuapp.com/api/deptlist/')
-    deptList_json = json.loads(deptList.text)
+    # deptList = requests.get('http://luthers-list.herokuapp.com/api/deptlist/')
+    # deptList_json = json.loads(deptList.text)
 
-    # makes sure there are no departments from previous calls
+    deptList_json = json.load(open('fall_2022_class_data/all_departments.json'))
+    # print(type(deptList_json))
+
+    with open('fall_2022_class_data/all_departments.json') as data_file:
+        json = json.load(data_file)
+
+        # for subject in json:
+        #     print(subject)
+
+    # # makes sure there are no departments from previous calls
     if Departments.objects.exists():
         Departments.objects.all().delete()
-
-    # Get all of the current departments available
+    #
+    # # Get all of the current departments available
     for i in range(len(deptList_json)):
-        newDept = Departments(dept=deptList_json[i].get("subject"))
-        newDept.save()
+        if not Departments.objects.filter(dept=deptList_json[i].get("subject")):
+            newDept = Departments(dept=deptList_json[i].get("subject"))
+            newDept.save()
+
+    # Temporary Department placeholder
+    # newDept = Departments(dept="CS")
+    # newDept.save()
 
     def get_queryset(self):
         return Departments.objects.all()
@@ -147,14 +161,17 @@ def department(request, dept):
 
     # Get the json file for the request department
     dept = dept.upper()
-    dept_request = "http://luthers-list.herokuapp.com/api/dept/" + dept
-    dept_classes = requests.get(dept_request)
-    dept_classes_json = json.loads(dept_classes.text)
+    # dept_request = "http://luthers-list.herokuapp.com/api/dept/" + dept
+    # dept_classes = requests.get(dept_request)
+    # dept_classes_json = json.loads(dept_classes.text)
 
-    # Get all of the classes in the requested department
+    file_name = "fall_2022_class_data/" + dept + ".json"
+    dept_classes_json = json.load(open(file_name))
+
+    # # Get all of the classes in the requested department
     for i in range(len(dept_classes_json)):
         current_class = dept_classes_json[i]
-
+    
         # if the course doesn't exists then we will add it
         if not Course.objects.filter(subject=dept,
                                      catalog_number=current_class.get('catalog_number'),
@@ -169,6 +186,17 @@ def department(request, dept):
                               course_number=current_class.get('course_number'),
                               description=current_class.get('description'))
             newClass.save()
+            # print(newClass)
+
+    # Course.objects.all().delete()
+
+    # newClass = Course(subject='CS',
+    #                   catalog_number='1010',
+    #                   instructor='Derrick Stone',
+    #                   section='001',
+    #                   course_number='16351',
+    #                   description='Introduction to Information Technology')
+    # newClass.save()
 
     context = {
         'student_name': User.objects.get(email=request.user.email).name,
@@ -176,8 +204,8 @@ def department(request, dept):
         'dept': dept
     }
 
-    if User.objects.get(email=request.user.email).name == "":
-        context['student_name'] = request.user
+    # if User.objects.get(email=request.user.email).name == "":
+    #     context['student_name'] = request.user
 
     return render(request, template_name, context)
 
